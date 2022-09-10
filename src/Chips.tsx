@@ -5,17 +5,17 @@ import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 
 type ChipsProps = {
-  active: string[];
+  pagingList: string[];
   handleDelete: (a: string) => void;
   handleClear: () => void;
 };
 
 export default function Chips({
-  active,
+  pagingList,
   handleDelete,
   handleClear,
 }: ChipsProps) {
-  if (active.length == 0) return null;
+  if (pagingList.length == 0) return null;
 
   return (
     <Paper
@@ -47,7 +47,7 @@ export default function Chips({
           flexWrap: "wrap",
         }}
       >
-        {active.map((a) => (
+        {pagingList.map((a) => (
           <Chip
             key={a}
             sx={{
@@ -68,7 +68,7 @@ export default function Chips({
             my: 1,
           }}
         >
-          {active.length > 1 ? "Clear All" : "Clear"}
+          {pagingList.length > 1 ? "Clear All" : "Clear"}
         </Button>
       </Box>
     </Paper>

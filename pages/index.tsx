@@ -7,8 +7,9 @@ import Box from "@mui/material/Box";
 import Chips from "../src/Chips";
 import Pager from "../src/Pager";
 
-const ROTATE_SPEED = 10000;
-const server = "http://192.168.2.25:4001";
+const ROTATE_SPEED = 6500;
+const server = "http://127.0.0.1:4001";
+// const server = "http://192.168.2.25:4001";
 const project = "ABCD";
 const graphicId = "29CGH";
 
@@ -17,54 +18,49 @@ function delay(time: number) {
 }
 
 const Home: NextPage = () => {
-  const [active, setActive] = React.useState<string[]>([]);
+  const [pagingList, setPagingList] = React.useState<string[]>([]);
+  const [active, setActive] = React.useState("");
 
   React.useEffect(() => {
-    const clearGraphic = async () => {
-      await axios.post(`${server}/api/${project}/clear`);
-    };
+    if (pagingList.length > 0) {
+      setActive((active) => active || pagingList[0]);
+      const id = setInterval(() => {
+        setActive(
+          (a) => pagingList[(pagingList.indexOf(a) + 1) % pagingList.length]
+        );
+      }, ROTATE_SPEED);
+      return () => clearInterval(id);
+    }
+    setActive("");
+    return () => {};
+  }, [pagingList]);
 
-    const showGraphic = async (text: string) => {
-      await clearGraphic();
+  React.useEffect(() => {
+    const showGraphic = async () => {
+      await axios.post(`${server}/api/${project}/clear`);
       await delay(300);
       await axios.post(`${server}/api/${project}/graphic/${graphicId}/update`, {
-        body: text,
+        body: active,
       });
-      await delay(10);
       await axios.post(`${server}/api/${project}/graphic/${graphicId}/show`);
     };
-
-    let interval: number | null = null;
-
-    if (active.length > 1) {
-      showGraphic(active[0]);
-      let index = 1;
-      interval = window.setInterval(() => {
-        showGraphic(active[index]);
-        index = (index + 1) % active.length;
-      }, ROTATE_SPEED);
-    } else if (active.length === 1) {
-      showGraphic(active[0]);
+    if (active) {
+      showGraphic();
+    } else {
+      axios.post(`${server}/api/${project}/clear`);
     }
-
-    return () => {
-      if (interval != null) {
-        window.clearInterval(interval);
-      }
-      clearGraphic();
-    };
   }, [active]);
 
   function handleDelete(value: string) {
-    setActive(active.filter((a) => a !== value));
+    setPagingList(pagingList.filter((a) => a !== value));
   }
 
   function handleClear() {
-    setActive([]);
+    setPagingList([]);
   }
 
   function handleSubmit(text: string) {
-    setActive([...active.filter((a) => a !== text), text]);
+    setPagingList([...pagingList.filter((a) => a !== text), text]);
   }
 
   return (
@@ -90,17 +86,27 @@ const Home: NextPage = () => {
         <Pager onSubmit={handleSubmit} />
 
         <Chips
-          active={active}
+          pagingList={pagingList}
           handleDelete={handleDelete}
           handleClear={handleClear}
         />
+        {/* <Box
+          sx={{
+            mt: 4,
+          }}
+        >
+          <Typography variant="h5">Preview:</Typography>
+          <iframe
+            src={`${server}/output/${project}/?bg=%23000`}
+            style={{
+              width: 600,
+              height: (9 * 600) / 16,
+            }}
+          ></iframe>
+        </Box> */}
       </Box>
     </Container>
   );
 };
 
 export default Home;
-
-// async function handleSubmit() {
-
-// }
