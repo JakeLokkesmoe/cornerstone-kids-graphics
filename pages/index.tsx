@@ -8,8 +8,8 @@ import Chips from "../src/Chips";
 import Pager from "../src/Pager";
 
 const ROTATE_SPEED = 6500;
-const server = "http://127.0.0.1:4001";
-// const server = "http://192.168.2.25:4001";
+// const server = "http://127.0.0.1:4001";
+const server = "http://192.168.2.25:4001";
 const project = "ABCD";
 const graphicId = "29CGH";
 
