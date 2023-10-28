@@ -1,3 +1,5 @@
+"use client";
+
 import * as React from "react";
 import Paper from "@mui/material/Paper";
 import FormControl from "@mui/material/FormControl";
@@ -6,11 +8,11 @@ import OutlinedInput from "@mui/material/OutlinedInput";
 import InputAdornment from "@mui/material/InputAdornment";
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 
-type PagerProps = {
+type PagerInputProps = {
   onSubmit: (text: string) => void;
 };
 
-export default function Pager({ onSubmit }: PagerProps) {
+export default function PagerInput({ onSubmit }: PagerInputProps) {
   const [text, setText] = React.useState("");
 
   function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
