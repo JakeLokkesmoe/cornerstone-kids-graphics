@@ -4,16 +4,9 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import PagerInput from "./PagerInput";
 import Chips from "./Chips";
+import { Button } from "@mui/material";
 
 const ROTATE_SPEED = 6500;
-// const server = "http://127.0.0.1:4001";
-const server = "http://192.168.2.25:4001";
-const project = "ABCD";
-const graphicId = "29CGH";
-
-function delay(time: number) {
-  return new Promise((resolve) => setTimeout(resolve, time));
-}
 
 export default function Pager() {
   const [pagingList, setPagingList] = useState<string[]>([]);
@@ -35,17 +28,31 @@ export default function Pager() {
 
   useEffect(() => {
     const showGraphic = async () => {
-      await axios.post(`${server}/api/${project}/clear`);
-      await delay(300);
-      await axios.post(`${server}/api/${project}/graphic/${graphicId}/update`, {
-        body: active,
+      await fetch(`/api/atem`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ name: active }),
       });
-      await axios.post(`${server}/api/${project}/graphic/${graphicId}/show`);
+      // await axios.post(`${server}/api/${project}/clear`);
+      // await delay(300);
+      // await axios.post(`${server}/api/${project}/graphic/${graphicId}/update`, {
+      //   body: active,
+      // });
+      // await axios.post(`${server}/api/${project}/graphic/${graphicId}/show`);
     };
     if (active) {
       showGraphic();
     } else {
-      axios.post(`${server}/api/${project}/clear`);
+      fetch(`/api/atem`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ clear: true }),
+      });
+      //axios.post(`${server}/api/${project}/clear`);
     }
   }, [active]);
 
@@ -57,9 +64,11 @@ export default function Pager() {
     setPagingList([]);
   }
 
-  function handleSubmit(text: string) {
+  async function handleSubmit(text: string) {
     setPagingList([...pagingList.filter((a) => a !== text), text]);
   }
+
+  function genImage() {}
 
   return (
     <>
