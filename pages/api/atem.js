@@ -2,6 +2,7 @@ import { resolve } from "path";
 import sharp from "sharp";
 import satori from "satori";
 import Overlay from "../../components/Overlay";
+import { FlyKeyKeyFrame } from "atem-connection/dist/enums";
 
 const { Atem } = require("atem-connection");
 const fs = require("fs");
@@ -11,9 +12,8 @@ atem.on("info", console.log);
 atem.on("error", console.error);
 let connected = false;
 
-function delay(time) {
-  return new Promise((resolve) => setTimeout(resolve, time));
-}
+const AUD_ME = 1;
+const UPSTREAM_KEY = 3;
 
 async function showGraphic(name) {
   try {
@@ -37,12 +37,9 @@ async function showGraphic(name) {
       .raw({ channels: 4 })
       .toBuffer();
 
-    await atem.autoDownstreamKey(1, false);
-    await atem.setUpstreamKeyerOnAir(false, 1, 3);
-    await delay(1000);
     await atem.uploadStill(1, buffer, "test", "test desc");
     await atem.autoDownstreamKey(1, true);
-    await atem.setUpstreamKeyerOnAir(true, 1, 3);
+    await atem.runUpstreamKeyerFlyKeyTo(AUD_ME, UPSTREAM_KEY, FlyKeyKeyFrame.A);
   } catch (error) {
     console.error("Unable to set graphic", error);
   }
@@ -50,7 +47,7 @@ async function showGraphic(name) {
 
 async function clear() {
   await atem.autoDownstreamKey(1, false);
-  await atem.setUpstreamKeyerOnAir(false, 1, 3);
+  await atem.runUpstreamKeyerFlyKeyTo(AUD_ME, UPSTREAM_KEY, FlyKeyKeyFrame.B);
 }
 
 export default function handler(req, res) {
